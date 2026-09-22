@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "lucas.smplibs.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "LoadConfigs",
+    "OnPlayerJoin",
+    "SaveConfigs"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

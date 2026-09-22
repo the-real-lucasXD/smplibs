@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "smplibs",
+  "version": "${version}",
+  "name": "Lucas's SMP Libraries",
+  "description": "A mod that adds various SMP features and API helpers for some of my own SMP mods.",
+  "authors": [
+    "Lucas Loh"
+  ],
+  "contact": {
+    "sources": "https://github.com/the-real-lucasXD/smplibs",
+    "issues": "https://github.com/the-real-lucasXD/smplibs/issues"
+  },
+  "icon": "assets/smplibs/icon.png",
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "lucas.smplibs.SMPLibs"
+    ]
+  },
+  "mixins": [
+    "smplibs.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25"
+  }
+}

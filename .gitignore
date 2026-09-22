@@ -1,0 +1,7 @@
+# Build output
+.gradle
+build/
+run/
+
+# IntelliJ IDEA
+.idea
