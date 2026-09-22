@@ -1,14 +1,14 @@
 <img src="src/main/resources/assets/smplibs/icon.png" alt="SMPLibs" width="150">
 
 ## Lucas's SMP Libraries
-Lucas's SMP Libraries is a FabricMC utility and library mod that contains features that may be useful in a small-sized or private Minecraft SMP server and API helpers that can help me (and other developers) in developing custom SMP mods.
+Lucas's SMP Libraries is a FabricMC utility and library mod with features useful for small or private Minecraft SMP servers, plus API helpers to help me (and other developers) develop custom SMP mods.
 
 ### Features
 - _(Coming soon)_ Combat system
 - _(Coming soon)_ Teams
 
 ### API Utilities
-- Automatic config and player data storing system
+- Automatic config and player data storage system
 
 
 
@@ -17,7 +17,7 @@ Lucas's SMP Libraries is a FabricMC utility and library mod that contains featur
 ### Using the mod
 #### Prerequisites:
 - Working Minecraft Java `26.3+` server
-- Fabric loader of the corresponding Minecraft version
+- Fabric loader for the corresponding Minecraft version
 #### Instructions:
 1) Get the desired version of the mod from [Releases](https://github.com/the-real-lucasXD/smplibs/releases).
 2) Download the `.jar` file from the release and put it into the `mods` folder in your server root directory.
@@ -33,3 +33,4 @@ Lucas's SMP Libraries is a FabricMC utility and library mod that contains featur
 
 ## Achknowledgements
 This project uses the [MIT LICENSE](LICENSE).
+
