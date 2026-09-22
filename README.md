@@ -16,11 +16,11 @@ Lucas's SMP Libraries is a FabricMC utility and library mod that contains featur
 
 ### Using the mod
 #### Prerequisites:
-- Working Minecraft Java ```26.3+``` server
+- Working Minecraft Java `26.3+` server
 - Fabric loader of the corresponding Minecraft version
 #### Instructions:
 1) Get the desired version of the mod from [Releases](https://github.com/the-real-lucasXD/smplibs/releases).
-2) Download the ```.jar``` file from the release and put it into the ```mods``` folder in your server root directory.
+2) Download the `.jar` file from the release and put it into the `mods` folder in your server root directory.
 
 ### Depending on the mod
 #### Prerequisites:
