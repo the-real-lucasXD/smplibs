@@ -1,3 +1,5 @@
+#### Warning: This mod is currently in open beta. Please expect bugs, and report any to [issues](https://github.com/the-real-lucasXD/smplibs/issues). Thanks for helping me to improve my mod!
+
 <img src="src/main/resources/assets/smplibs/icon.png" alt="SMPLibs" width="150">
 
 ## Lucas's SMP Libraries
@@ -29,9 +31,32 @@ Lucas's SMP Libraries is a FabricMC utility and library mod with features useful
 2) Download the `.jar` file from the release and put it into the `mods` folder in your server root directory.
 
 ### Depending on the mod
-#### Instructions:
-1) Get the desired version of the mod from [Releases](https://github.com/the-real-lucasXD/smplibs/releases).
-2) Follow the instructions provided by the specific release.
+Locate your project's `build.gradle` file and add the following code:
+1. At `repositories`:
+```groovy
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        // forRepositories(fg.repository) // Uncomment if using ForgeGradle
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+```
+
+2. At `dependencies`:
+```groovy
+dependencies {
+    implementation "maven.modrinth:smplibs:<version>"
+    // implementation "maven.modrinth:smplibs:<version>:javadoc" // Uncomment for Javadoc, ONLY if using v1.1.0 or later
+}
+```
 
 
 
