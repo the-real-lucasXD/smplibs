@@ -4,11 +4,17 @@
 Lucas's SMP Libraries is a FabricMC utility and library mod with features useful for small or private Minecraft SMP servers, plus API helpers to help me (and other developers) develop custom SMP mods.
 
 ### Features
-- _(Coming soon)_ Combat system
+- Combat system
+  - Customizable settings, bans and limits
+  - Automatically enters and resets on player attack
+  - `/combat` admin commands to manage combat
+  - Kill player when they disconnect while in combat
 - _(Coming soon)_ Teams
 
 ### API Utilities
 - Automatic config and player data storage system
+- Event listeners
+  - Player death listeners by all sources and by another player
 
 
 
@@ -23,14 +29,12 @@ Lucas's SMP Libraries is a FabricMC utility and library mod with features useful
 2) Download the `.jar` file from the release and put it into the `mods` folder in your server root directory.
 
 ### Depending on the mod
-#### Prerequisites:
-- Fabric mod (refer to the [Fabric docs](https://docs.fabricmc.net/develop/getting-started/creating-a-project) for more information)
 #### Instructions:
 1) Get the desired version of the mod from [Releases](https://github.com/the-real-lucasXD/smplibs/releases).
 2) Follow the instructions provided by the specific release.
 
 
 
-## Achknowledgements
-This project uses the [MIT LICENSE](LICENSE).
+## Acknowledgements
+This project uses the [MIT license](LICENSE).
 
