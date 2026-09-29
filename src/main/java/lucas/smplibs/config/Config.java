@@ -1,5 +1,8 @@
 package lucas.smplibs.config;
 
+import lucas.smplibs.combat.CombatConfig;
+import org.jspecify.annotations.NonNull;
+
 /**
  * Represents the global configs for this SMP libraries, accessible by all other SMP mods.
  *
@@ -7,6 +10,8 @@ package lucas.smplibs.config;
  */
 public final class Config {
   static Config INSTANCE = new Config();
+
+  public @NonNull CombatConfig combat = new CombatConfig();
 
   /**
    * The accessor method for the global config. This method is designed to be imported as a static method:

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerList.class)
-public class OnPlayerJoin {
+class OnPlayerJoin {
   @Inject(method = "placeNewPlayer", at = @At("HEAD"), cancellable = true)
   private void placeNewPlayer(Connection connection, ServerPlayer player,
                               CommonListenerCookie cookie, CallbackInfo ci) {

@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "package": "lucas.smplibs.combat.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ClearCombat",
+    "CombatCommand",
+    "CombatLog",
+    "CombatLogMessage",
+    "StartCombat",
+    "TickCombat",
+    "limits.Cobwebs",
+    "limits.Egaps",
+    "limits.ExperienceBottles",
+    "limits.Gaps",
+    "limits.Pearls",
+    "limits.Totems",
+    "limits.Windcharges"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

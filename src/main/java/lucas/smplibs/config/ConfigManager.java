@@ -55,12 +55,11 @@ public final class ConfigManager {
         try {
           Config.INSTANCE = GSON.fromJson(Files.readString(path), Config.class);
           if (Config.INSTANCE == null) Config.INSTANCE = new Config();
-        } catch (Exception e) {
+        } catch (IOException e) {
           SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse default configs. " +
             "This could be due to a corrupted or malformed configs.json. Deleting that file may fix the problem. " +
             "The full error log will be included in the exception thrown below."
-          );
-          throw new RuntimeException(e);
+          ); throw new RuntimeException(e);
         }
       }
       saveDefault();
@@ -72,13 +71,12 @@ public final class ConfigManager {
           try {
             configs = GSON.fromJson(Files.readString(path), info.configClass());
             if (configs == null) configs = info.configClass().getDeclaredConstructor().newInstance();
-          } catch (Exception e) {
+          } catch (IOException e) {
             SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse configs for the mod " +
                 "with id '{}'. This could be due to a corrupted or malformed {}/configs.json. Deleting that file " +
                 "may fix the problem. The full error log will be included in the exception thrown below.",
               info.id(), info.id()
-            );
-            throw new RuntimeException(e);
+            ); throw new RuntimeException(e);
           }
         } else configs = info.configClass().getDeclaredConstructor().newInstance();
         values.put(info.id(), configs);

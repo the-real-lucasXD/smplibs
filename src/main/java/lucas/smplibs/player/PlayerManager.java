@@ -20,13 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 1.0.0
  */
-public class PlayerManager {
+public final class PlayerManager {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private static final ConcurrentHashMap<String, ConcurrentHashMap<String, AttachedPlayer>> players = new ConcurrentHashMap<>();
 
   /**
    * Attaches player data for all queued SMPs into the registry. This method should not be called, as it is automatically
-   * called at the end of server startup.
+   * called at the end of server startup. Calling it otherwise may result in unexpected bugs.
    */
   @ApiStatus.Internal
   public static void loadAndAttach() {
@@ -37,12 +37,11 @@ public class PlayerManager {
           Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, Player.class).getType();
           Player.values = GSON.fromJson(Files.readString(path), type);
           if (Player.values == null) Player.values = new ConcurrentHashMap<>();
-        } catch (Exception e) {
+        } catch (IOException e) {
           SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse default player data. " +
             "This could be due to a corrupted or malformed playerdata.json. Deleting that file may fix the problem. " +
             "The full error log will be included in the exception thrown below."
-          );
-          throw new RuntimeException(e);
+          ); throw new RuntimeException(e);
         }
       }
       Player.values.forEach((uuid, player) -> player.uuid = uuid);
@@ -57,13 +56,12 @@ public class PlayerManager {
             values = GSON.fromJson(Files.readString(path), type);
             if (values == null) values = new ConcurrentHashMap<>();
             values.forEach((uuid, value) -> value.setPlayer(Player.get(uuid)));
-          } catch (Exception e) {
+          } catch (IOException e) {
             SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse player data for the mod " +
                 "with id '{}'. This could be due to a corrupted or malformed {}/playerdata.json. Deleting that file " +
                 "may fix the problem. The full error log will be included in the exception thrown below.",
               info.id(), info.id()
-            );
-            throw new RuntimeException(e);
+            ); throw new RuntimeException(e);
           }
         } else values = new ConcurrentHashMap<>();
         players.put(info.id(), values);
@@ -74,7 +72,7 @@ public class PlayerManager {
     }
   }
 
-  public static void save(String id, ConcurrentHashMap<String, AttachedPlayer> values) throws IOException {
+  private static void save(String id, ConcurrentHashMap<String, AttachedPlayer> values) throws IOException {
     var path = FabricLoader.getInstance().getConfigDir().resolve("smp/"+id+"/playerdata.json");
     Files.createDirectories(path.getParent());
     if (Files.notExists(path)) Files.createFile(path);
@@ -83,10 +81,11 @@ public class PlayerManager {
 
   /**
    * Saves all default player data. This method should not be called, as it is automatically called each time
-   * the server is saved.
+   * the server is saved. Calling it otherwise may result in unexpected bugs.
    *
    * @throws IOException if an error occurrs while saving player data.
    */
+  @ApiStatus.Internal
   public static void saveDefault() throws IOException {
     var path = FabricLoader.getInstance().getConfigDir().resolve("smp/playerdata.json");
     Files.createDirectories(path.getParent());
@@ -95,7 +94,7 @@ public class PlayerManager {
   }
 
   /**
-   * Retrieve the data of a specific player of a mod. Note that this method returns the data with {@link AttachedPlayer}
+   * Retrieve the data of a specific player of an SMP. Note that this method returns the data with {@link AttachedPlayer}
    * type. To get the player data in the correct class, cast it with:
    *  <blockquote><pre>
    *   public static CustomPlayer get(ServerPlayer player) {
@@ -155,7 +154,7 @@ public class PlayerManager {
 
   /**
    * Loads all required player data of a player. This method should not be called, as it is automatically called
-   * each time a player joins.
+   * each time a player joins. Calling it otherwise may result in unexpected bugs.
    */
   @ApiStatus.Internal
   public static void loadAllPlayerAttachments(ServerPlayer player) {
@@ -166,7 +165,7 @@ public class PlayerManager {
 
   /**
    * Saves the player data of all custom SMPs. This method should not be called, as it is automatically called each time
-   * the server is saved.
+   * the server is saved. Calling it otherwise may result in unexpected bugs.
    */
   @ApiStatus.Internal
   public static void saveAll() {

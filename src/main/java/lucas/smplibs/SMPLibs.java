@@ -6,12 +6,15 @@ import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Entrypoint for the SMPLibs mod.
+ *
+ * @since 1.0.0
+ */
 public final class SMPLibs implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("smplibs");
 	public static MinecraftServer server;
 
 	@Override
-	public void onInitialize() {
-		LOGGER.info("Successfully loaded SMPLibs mod");
-	}
+	public void onInitialize() {}
 }

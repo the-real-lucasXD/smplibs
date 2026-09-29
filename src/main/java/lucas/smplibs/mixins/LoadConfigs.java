@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(DedicatedServer.class)
-public class LoadConfigs {
+class LoadConfigs {
 	@Inject(method = "initServer", at = @At("RETURN"))
 	private void init(CallbackInfoReturnable<Boolean> cir) {
 		if (!cir.getReturnValue()) return;
