@@ -28,8 +28,8 @@ public final class ConfigManager {
 
   /**
    * Queues for registering (attaching) the SMP in the SMP registry, such that configs and player data will be loaded.
-   *
-   * @implNote As attaching occurs as the last step of the startup phase of the server, {@code queueAttach} must only
+   * <p>
+   * As attaching occurs as the last step of the startup phase of the server, {@code queueAttach} must only
    * be called during the startup phase. It is recommended that the mod is initialized in the {@code onInitialize}
    * method in the mod entrypoint class.
    * @param info the {@link SMPInfo} object containing all metadata and components of the mod

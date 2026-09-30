@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "lucas.smplibs.listeners",
+  "package": "lucas.smplibs.listeners.mixins",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "PlayerDied"

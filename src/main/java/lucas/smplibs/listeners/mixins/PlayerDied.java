@@ -1,5 +1,6 @@
-package lucas.smplibs.listeners;
+package lucas.smplibs.listeners.mixins;
 
+import lucas.smplibs.listeners.PlayerDeathListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;

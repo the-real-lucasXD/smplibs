@@ -1,11 +1,12 @@
 package lucas.smplibs.listeners;
 
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Contains the listener classes to register events to execute when players die, reducing the need for mixins.
@@ -22,15 +23,16 @@ public final class PlayerDeathListener {
    * </pre></blockquote>
    */
   public static final class ByPlayer {
-    private static final ArrayList<BiFunction<@NonNull ServerPlayer, @NonNull ServerPlayer, Void>> registered =
+    private static final ArrayList<BiConsumer<@NonNull ServerPlayer, @NonNull ServerPlayer>> registered =
       new ArrayList<>();
 
-    public static void register(BiFunction<@NonNull ServerPlayer, @NonNull ServerPlayer, Void> method) {
+    public static void register(BiConsumer<@NonNull ServerPlayer, @NonNull ServerPlayer> method) {
       registered.add(method);
     }
 
-    static void trigger(ServerPlayer died, ServerPlayer attacker) {
-      for (var method : registered) method.apply(died, attacker);
+    @ApiStatus.Internal
+    public static void trigger(ServerPlayer died, ServerPlayer attacker) {
+      for (var method : registered) method.accept(died, attacker);
     }
   }
 
@@ -44,15 +46,16 @@ public final class PlayerDeathListener {
    * </pre></blockquote>
    */
   public static class Any {
-    private static final ArrayList<Function<ServerPlayer, Void>> registered =
+    private static final ArrayList<Consumer<ServerPlayer>> registered =
       new ArrayList<>();
 
-    public static void register(Function<ServerPlayer, Void> method) {
+    public static void register(Consumer<ServerPlayer> method) {
       registered.add(method);
     }
 
-    static void trigger(ServerPlayer died) {
-      for (var method : registered) method.apply(died);
+    @ApiStatus.Internal
+    public static void trigger(ServerPlayer died) {
+      for (var method : registered) method.accept(died);
     }
   }
 }
