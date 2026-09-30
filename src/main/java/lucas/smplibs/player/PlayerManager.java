@@ -145,7 +145,8 @@ public final class PlayerManager {
     if (!values.containsKey(uuid)) {
       Class<? extends AttachedPlayer> playerClass = ConfigManager.attachments().get(id).playerClass();
 
-      AttachedPlayer newInstance = playerClass.getConstructor(Player.class).newInstance(Player.get(player));
+      AttachedPlayer newInstance = playerClass.getConstructor().newInstance();
+      newInstance.setPlayer(Player.get(player));
       values.put(uuid, newInstance);
     }
 

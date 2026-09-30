@@ -28,7 +28,7 @@ class SaveConfigs {
         ConfigManager.saveAll();
         PlayerManager.saveDefault();
         PlayerManager.saveAll();
-      } firstSave = true;
+      } firstSave = false;
     } catch (IOException e) {
       SMPLibs.LOGGER.error("An unexpected error occurred while trying to save configs: ", e);
     }
