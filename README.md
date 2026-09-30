@@ -62,6 +62,13 @@ Lucas's SMP Libraries is a FabricMC utility and library mod with features useful
       // implementation "maven.modrinth:smplibs:<version>:javadoc" // Uncomment for Javadoc, ONLY if using v1.1.0 or later
   }
   ```
+
+  Then, locate your project's `fabric.mod.json` and add this code at `depends`:
+  ```json
+  "depends": {
+    "smplibs": ">=<version>"
+  }
+  ```
 </details>
 
 
