@@ -3,7 +3,8 @@
   "package": "lucas.smplibs.listeners.mixins",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "PlayerDied"
+    "PlayerDied",
+    "TickServer"
   ],
   "injectors": {
     "defaultRequire": 1

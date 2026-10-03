@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import org.jspecify.annotations.NonNull;
 
-
 /**
  * Describes the metadata and associated classes for a custom SMP. To load the SMP, put the following code somewhere that will
  * be called during the server startup (for example, during mod initialization):
