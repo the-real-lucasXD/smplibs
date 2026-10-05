@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Represents the utility class for the initialization of all player data classes.
+ * Represents the utility class for the management of all player data classes.
  *
  * @since 1.0.0
  */
@@ -55,7 +55,7 @@ public final class PlayerManager {
             Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, info.playerClass()).getType();
             values = GSON.fromJson(Files.readString(path), type);
             if (values == null) values = new ConcurrentHashMap<>();
-            values.forEach((uuid, value) -> value.setPlayer(Player.get(uuid)));
+            values.forEach((uuid, value) -> value.player = Player.get(uuid));
           } catch (IOException e) {
             SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse player data for the mod " +
                 "with id '{}'. This could be due to a corrupted or malformed {}/playerdata.json. Deleting that file " +
@@ -131,7 +131,7 @@ public final class PlayerManager {
    * @return the custom player data for the target player, with type {@link Object}
    */
   public static AttachedPlayer get(String id, String uuid) {
-    ConcurrentHashMap<String, ? extends AttachedPlayer> values = players.get(id);
+    ConcurrentHashMap<String, AttachedPlayer> values = players.get(id);
     if (values == null) return null;
 
     return values.get(uuid);
@@ -146,7 +146,7 @@ public final class PlayerManager {
       Class<? extends AttachedPlayer> playerClass = ConfigManager.attachments().get(id).playerClass();
 
       AttachedPlayer newInstance = playerClass.getConstructor().newInstance();
-      newInstance.setPlayer(Player.get(player));
+      newInstance.player = Player.get(player);
       values.put(uuid, newInstance);
     }
 

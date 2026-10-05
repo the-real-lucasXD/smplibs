@@ -20,7 +20,7 @@ import static lucas.smplibs.config.Config.configs;
  * @see AttachedPlayer
  */
 public final class Player {
-  public transient String uuid;
+  transient String uuid;
   public transient boolean online = false;
   private Player(String uuid) { this.uuid = uuid; }
   public UUID uuid() { return UUID.fromString(uuid); }

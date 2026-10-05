@@ -22,7 +22,8 @@
   "mixins": [
     "smplibs.mixins.json",
     "smplibs.combat.mixins.json",
-    "smplibs.listeners.mixins.json"
+    "smplibs.listeners.mixins.json",
+    "smplibs.teams.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.5",

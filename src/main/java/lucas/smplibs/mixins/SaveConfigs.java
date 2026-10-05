@@ -3,7 +3,9 @@ package lucas.smplibs.mixins;
 import lucas.smplibs.SMPLibs;
 import lucas.smplibs.combat.Combat;
 import lucas.smplibs.config.ConfigManager;
+import lucas.smplibs.listeners.ServerStoppingListener;
 import lucas.smplibs.player.PlayerManager;
+import lucas.smplibs.teams.TeamManager;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,6 +30,8 @@ class SaveConfigs {
         ConfigManager.saveAll();
         PlayerManager.saveDefault();
         PlayerManager.saveAll();
+        TeamManager.loadAllTeams();
+        TeamManager.saveAll();
       } firstSave = false;
     } catch (IOException e) {
       SMPLibs.LOGGER.error("An unexpected error occurred while trying to save configs: ", e);
@@ -37,11 +41,14 @@ class SaveConfigs {
   @Inject(method = "stopServer", at = @At("HEAD"))
   private void onWorldClose(CallbackInfo ci) {
     try {
+      ServerStoppingListener.trigger();
       Combat.clearAll();
       ConfigManager.saveDefault();
       ConfigManager.saveAll();
       PlayerManager.saveDefault();
       PlayerManager.saveAll();
+      TeamManager.loadAllTeams();
+      TeamManager.saveAll();
     } catch (IOException e) {
       SMPLibs.LOGGER.error("An unexpected error occurred while trying to save configs: ", e);
     }

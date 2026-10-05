@@ -21,7 +21,6 @@ package lucas.smplibs.player;
  * @since 1.0.0
  */
 public class AttachedPlayer {
-  private transient Player player;
-  final void setPlayer(Player player) { this.player = player; }
+  transient Player player;
   public final Player player() { return player; }
 }

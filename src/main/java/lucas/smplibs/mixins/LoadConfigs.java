@@ -3,6 +3,7 @@ package lucas.smplibs.mixins;
 import lucas.smplibs.SMPLibs;
 import lucas.smplibs.config.ConfigManager;
 import lucas.smplibs.player.PlayerManager;
+import lucas.smplibs.teams.TeamManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,5 +19,7 @@ class LoadConfigs {
 		SMPLibs.server = (MinecraftServer) (Object) this;
     ConfigManager.loadAndAttach();
     PlayerManager.loadAndAttach();
+    TeamManager.loadAndAttach();
+    TeamManager.loadAllTeams();
 	}
 }
