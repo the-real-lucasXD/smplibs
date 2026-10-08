@@ -1,7 +1,7 @@
 package lucas.smplibs.player;
 
 /**
- * Contains the base class for the player data of an SMP. To define player data, use the following format:
+ * Contains the base class for custom player data of an SMP. To define player data, use the following format:
  * <blockquote><pre>
  *   public class CustomPlayer extends AttachedPlayer {
  *     // define custom methods and fields here. Examples:
@@ -15,7 +15,7 @@ package lucas.smplibs.player;
  *     public transient double currentHealth = 20.0f
  *   }
  * </pre></blockquote>
- * Afterwards, simply put {@code CustomPlayer.class} as the field for
+ * Afterwards, put {@code CustomPlayer.class} as the field for
  * {@code SMPInfo#playerClass} and all non-static, non-transient methods will be saved.
  *
  * @since 1.0.0

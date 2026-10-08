@@ -1,7 +1,9 @@
 package lucas.smplibs.combat;
 
 /**
- * The config object representing the settings for combat.
+ * Configs regarding the combat system.
+ *
+ * @since 1.1.0
  */
 public final class CombatConfig {
   public int duration = 1200;

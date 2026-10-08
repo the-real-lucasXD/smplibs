@@ -2,7 +2,6 @@ package lucas.smplibs.mixins;
 
 import lucas.smplibs.SMPLibs;
 import lucas.smplibs.player.Player;
-import lucas.smplibs.player.PlayerManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
@@ -20,13 +19,11 @@ class OnPlayerJoin {
   private void placeNewPlayer(Connection connection, ServerPlayer player,
                               CommonListenerCookie cookie, CallbackInfo ci) {
     try {
-      var defaultPlayer = Player.get(player);
+      Player defaultPlayer = Player.get(player);
       defaultPlayer.online = true;
-      PlayerManager.loadAllPlayerAttachments(player);
     } catch (Exception e) {
       SMPLibs.LOGGER.error("An error occurred while trying to load configs for {}", player.getScoreboardName(), e);
-      var reason = Component.literal("An unexpected error occurred while trying to load the SMP settings for " +
-        "your profile. Please retry, and if the error persists, contact mods.");
+      var reason = Component.literal("Error while loading player data");
       connection.send(new ClientboundDisconnectPacket(reason));
       connection.disconnect(reason);
       ci.cancel();

@@ -16,6 +16,8 @@ import static lucas.smplibs.player.Player.players;
 /**
  * The {@code Combat} class represents the object instance and manager for each combat, which manages resetting, GUI, limits
  * and bans.
+ *
+ * @since 1.1.0
  */
 public final class Combat {
   public @NonNull CombatLimitManager limitManager = new CombatLimitManager();

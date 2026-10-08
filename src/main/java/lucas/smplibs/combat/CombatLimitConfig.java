@@ -1,7 +1,7 @@
 package lucas.smplibs.combat;
 
 /**
- * The config object for the item limits allowed during combat.
+ * Configs regarding limits during combat. A value of {@code -1} represents no limit for that field.
  *
  * @since 1.1.0
  */
