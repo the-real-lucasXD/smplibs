@@ -2,7 +2,9 @@ package lucas.smplibs.player;
 
 import lucas.smplibs.SMPLibs;
 import lucas.smplibs.combat.Combat;
+import lucas.smplibs.teams.Team;
 import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -22,12 +24,19 @@ import static lucas.smplibs.config.Config.configs;
 public final class Player {
   transient String uuid;
   public transient boolean online = false;
-  private Player(String uuid) { this.uuid = uuid; }
   public UUID uuid() { return UUID.fromString(uuid); }
+
+  /**
+   * Gets the {@link ServerPlayer} object of the player, if they are online.
+   * @return the player's {@link ServerPlayer} object, or {@code null} if the player is offline, or the
+   *         server is {@code null}.
+   */
   public ServerPlayer serverPlayer() {
     if (!this.online) return null;
-    return SMPLibs.server == null ? null : SMPLibs.server.getPlayerList().getPlayer(uuid());
+    return SMPLibs.server() == null ? null : SMPLibs.server().getPlayerList().getPlayer(uuid());
   }
+
+  private Player(String uuid) { this.uuid = uuid; }
 
   private transient Combat combat = null;
   public Combat combat() { return combat; }
@@ -42,9 +51,22 @@ public final class Player {
     if (!inCombat()) combat = new Combat(this, attacker);
     else combat.reset(attacker);
   }
+
   public void inventoryRefresh() { Objects.requireNonNull(serverPlayer()).containerMenu.sendAllDataToRemote(); }
 
-  static ConcurrentHashMap<String, Player> values = new ConcurrentHashMap<>();
+  public boolean leaveTeam() {
+    Team team = getTeam();
+    if (team != null) team.removeFromTeam(this);
+    return team != null;
+  }
+  public Team getTeam() {
+    for (Team team : Team.teams().values()) {
+      if (team.isInTeam(this)) return team;
+    } return null;
+  }
+
+
+  static Map<String, Player> values = new ConcurrentHashMap<>();
   /**
    * Retrieve all default player data.
    * @return an unmodifiable {@link Map} containing the player object, where the key is a {@link String}
@@ -59,18 +81,13 @@ public final class Player {
    * @return the {@link Player} object in the registry representing the player's data. If the {@code player} is not found
    * in the registry, a new object is automatically created and that object is returned.
    */
-  public static Player get(ServerPlayer player) {
-    if (!values.containsKey(player.getStringUUID()))
-      values.put(player.getStringUUID(), new Player(player.getStringUUID()));
-    return get(player.getStringUUID());
+  public static @NonNull Player get(ServerPlayer player) { return get(player.getStringUUID(), true); }
+  public static @NonNull Player get(String uuid) { return get(uuid, true); }
+  public static @NonNull Player get(String uuid, boolean check) {
+    if (!values.containsKey(uuid)) {
+      Player player = new Player(uuid);
+      values.put(uuid, player);
+      if (check) PlayerManager.updateAcrossAllAttachments(player);
+    } return values.get(uuid);
   }
-
-  /**
-   * Retrieve the default player data of a player.
-   *
-   * @param uuid the target player's string UUID
-   * @return the {@link Player} object in the registry representing the player's data. If the {@code player}
-   * is not found in the registry, {@code null} is returned.
-   */
-  public static Player get(String uuid) { return values.get(uuid); }
 }

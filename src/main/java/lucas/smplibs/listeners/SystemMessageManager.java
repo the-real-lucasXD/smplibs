@@ -21,7 +21,7 @@ import java.util.function.Function;
  *   })
  * </pre></blockquote>
  *
- * @since 1.1.1
+ * @since 1.2.0
  */
 public class SystemMessageManager {
   private static final ArrayList<Function<ServerPlayer, MutableComponent>> registered = new ArrayList<>();
@@ -30,7 +30,7 @@ public class SystemMessageManager {
 
   @ApiStatus.Internal
   public static void tick() {
-    for (ServerPlayer player : SMPLibs.server.getPlayerList().getPlayers()) {
+    for (ServerPlayer player : SMPLibs.server().getPlayerList().getPlayers()) {
       MutableComponent res = Component.empty();
       for (int i=0; i<registered.size(); i++) {
         res.append(registered.get(i).apply(player));

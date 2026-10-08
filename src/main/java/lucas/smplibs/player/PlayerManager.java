@@ -3,16 +3,19 @@ package lucas.smplibs.player;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import lucas.smplibs.SMPLibs;
 import lucas.smplibs.SMPInfo;
+import lucas.smplibs.SMPLibs;
 import lucas.smplibs.config.ConfigManager;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NonNull;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,75 +25,146 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PlayerManager {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-  private static final ConcurrentHashMap<String, ConcurrentHashMap<String, AttachedPlayer>> players = new ConcurrentHashMap<>();
+  private static final Map<String, Map<String, AttachedPlayer>> players = new ConcurrentHashMap<>();
 
-  /**
-   * Attaches player data for all queued SMPs into the registry. This method should not be called, as it is automatically
-   * called at the end of server startup. Calling it otherwise may result in unexpected bugs.
-   */
+  static void updateAcrossAllAttachments(@NonNull Player player) {
+    try {
+      for (SMPInfo info : ConfigManager.attachments().values()) {
+        AttachedPlayer attachedPlayer = info.playerClass().getConstructor().newInstance();
+        attachedPlayer.player = player;
+        players.get(info.id()).putIfAbsent(player.uuid, attachedPlayer);
+      }
+    } catch (Exception e) { throw new RuntimeException(e); }
+  }
+
   @ApiStatus.Internal
   public static void loadAndAttach() {
     try {
-      var path = FabricLoader.getInstance().getConfigDir().resolve("smp/playerdata.json");
-      if (Files.exists(path)) {
+      if (ConfigManager.attached()) return;
+      Path path = SMPLibs.configDir();
+      boolean created = false;
+      Path resolved = path.resolve("playerdata.json");
+      if (Files.exists(resolved)) {
+        Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, Player.class).getType();
+        String json = Files.readString(resolved);
         try {
-          Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, Player.class).getType();
-          Player.values = GSON.fromJson(Files.readString(path), type);
-          if (Player.values == null) Player.values = new ConcurrentHashMap<>();
-        } catch (IOException e) {
-          SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse default player data. " +
-            "This could be due to a corrupted or malformed playerdata.json. Deleting that file may fix the problem. " +
-            "The full error log will be included in the exception thrown below."
-          ); throw new RuntimeException(e);
+          Player.values = GSON.fromJson(json, type);
+          if (Player.values != null) created = true;
+        } catch (Exception e) {
+          SMPLibs.LOGGER.error("Incomplete or corrupted default player data, resetting");
+          Path oldPath = path.resolve("playerdata-old.jsonc");
+          Files.createDirectories(oldPath.getParent());
+          Files.writeString(oldPath, """
+          /*
+            This file has corrupted or incomplete player data, as such a new
+            default file has been created instead to allow the mod to load
+            properly. To restore this set of player data,
+            1) Look through this file and search for and fix problems with the
+               JSON. Referring to the new player data file can help.
+            2) Remove this comment.
+            3) Stop the server.
+            4) Replace file contents of the original player data config with
+               the contents of this file.
+            5) Restart the server. If the problem(s) have been fixed, the server
+               should start properly.
+          */
+          \n
+          \n
+          """);
+          Files.writeString(oldPath, json, StandardOpenOption.APPEND);
+          SMPLibs.LOGGER.info("Successfully saved old player data to playerdata-old.jsonc");
         }
-      }
+      } if (!created) Player.values = new ConcurrentHashMap<>();
       Player.values.forEach((uuid, player) -> player.uuid = uuid);
-      saveDefault();
 
       for (SMPInfo info : ConfigManager.attachments().values()) {
-        ConcurrentHashMap<String, AttachedPlayer> values;
-        path = FabricLoader.getInstance().getConfigDir().resolve("smp/" + info.id() + "/playerdata.json");
-        if (Files.exists(path)) {
+        path = SMPLibs.configDir(info.id());
+        created = false;
+        resolved = path.resolve("playerdata.json");
+        Map<String, AttachedPlayer> map = new ConcurrentHashMap<>();
+        if (Files.exists(resolved)) {
+          Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, info.playerClass()).getType();
+          String json = Files.readString(resolved);
           try {
-            Type type = TypeToken.getParameterized(ConcurrentHashMap.class, String.class, info.playerClass()).getType();
-            values = GSON.fromJson(Files.readString(path), type);
-            if (values == null) values = new ConcurrentHashMap<>();
-            values.forEach((uuid, value) -> value.player = Player.get(uuid));
-          } catch (IOException e) {
-            SMPLibs.LOGGER.error("An unexpected error occurred while attempting to parse player data for the mod " +
-                "with id '{}'. This could be due to a corrupted or malformed {}/playerdata.json. Deleting that file " +
-                "may fix the problem. The full error log will be included in the exception thrown below.",
-              info.id(), info.id()
-            ); throw new RuntimeException(e);
+            map = GSON.fromJson(json, type);
+            if (map != null) created = true;
+          } catch (Exception e) {
+            SMPLibs.LOGGER.error("Incomplete or corrupted player data for {}, resetting", info.id());
+            Path oldPath = path.resolve("playerdata-old.jsonc");
+            Files.createDirectories(oldPath.getParent());
+            Files.writeString(oldPath, """
+              /*
+                This file has corrupted or incomplete player data, as such a new
+                default file has been created instead to allow the mod to load
+                properly. To restore this set of player data,
+                1) Look through this file and search for and fix problems with the
+                   JSON. Referring to the new player data file can help.
+                2) Remove this comment.
+                3) Stop the server.
+                4) Replace file contents of the original player data config with
+                   the contents of this file.
+                5) Restart the server. If the problem(s) have been fixed, the server
+                   should start properly.
+              */
+              \n
+              \n
+              """);
+            Files.writeString(oldPath, json, StandardOpenOption.APPEND);
+            SMPLibs.LOGGER.info("Successfully saved old player data to {}/playerdata-old.jsonc", info.id());
           }
-        } else values = new ConcurrentHashMap<>();
-        players.put(info.id(), values);
-        save(info.id(), values);
+        } if (!created) map = new ConcurrentHashMap<>();
+        map.forEach((uuid, player) -> player.player = Player.get(uuid));
+        players.put(info.id(), map);
       }
+
+      Player.values.forEach((uuid, _) -> {
+        for (SMPInfo info : ConfigManager.attachments().values()) get(info.id(), uuid);
+      });
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
+  @ApiStatus.Internal
+  public static void save() {
+    try {
+      Path path = SMPLibs.configDir().resolve("playerdata.json");
+      Files.createDirectories(path.getParent());
+      Files.writeString(path, GSON.toJson(Player.values));
 
-  private static void save(String id, ConcurrentHashMap<String, AttachedPlayer> values) throws IOException {
-    var path = FabricLoader.getInstance().getConfigDir().resolve("smp/"+id+"/playerdata.json");
-    Files.createDirectories(path.getParent());
-    if (Files.notExists(path)) Files.createFile(path);
-    Files.writeString(path, GSON.toJson(values));
+      for (SMPInfo info : ConfigManager.attachments().values()) {
+        path = SMPLibs.configDir(info.id()).resolve("playerdata.json");
+        Files.createDirectories(path.getParent());
+        Files.writeString(path, GSON.toJson(players.get(info.id())));
+      }
+    } catch (Exception e) {
+      SMPLibs.LOGGER.error("Failed to save player data", e);
+    }
   }
 
   /**
-   * Saves all default player data. This method should not be called, as it is automatically called each time
-   * the server is saved. Calling it otherwise may result in unexpected bugs.
+   * Retrieve the data of a specific player of an SMP. Note that this method returns the data with {@link AttachedPlayer}
+   * type. To get the player data in the correct class, cast it with:
+   *  <blockquote><pre>
+   *   public static CustomPlayer get(String uuid) {
+   *     return (CustomPlayer) PlayerManager.get("custom", uuid);
+   *   }
+   * </pre></blockquote>
    *
-   * @throws IOException if an error occurrs while saving player data.
+   * @param id the unique id of the mod
+   * @param uuid the target player's uuid
+   * @return the custom player data for the target player, with type {@link AttachedPlayer}. If no player is found, a
+   *         new object is automatically created and is updated across all player data registries as well as the default
+   *         {@link Player} registry.
+   * @throws IllegalArgumentException if the mod of id {@code id} has not been registered
    */
-  @ApiStatus.Internal
-  public static void saveDefault() throws IOException {
-    var path = FabricLoader.getInstance().getConfigDir().resolve("smp/playerdata.json");
-    Files.createDirectories(path.getParent());
-    if (Files.notExists(path)) Files.createFile(path);
-    Files.writeString(path, GSON.toJson(Player.values));
+  public static @NonNull AttachedPlayer get(String id, String uuid) {
+    if (!players.containsKey(id)) throw new NoSuchElementException("No such attachment of name " + id + "!");
+    Map<String, AttachedPlayer> map = players.get(id);
+    if (!map.containsKey(uuid)) {
+      Player player = Player.get(uuid, false);
+      updateAcrossAllAttachments(player);
+    }
+    return map.get(uuid);
   }
 
   /**
@@ -104,78 +178,10 @@ public final class PlayerManager {
    *
    * @param id the unique id of the mod
    * @param player the target player's {@link ServerPlayer} object
-   * @return the custom player data for the target player, with type {@link Object}
+   * @return the custom player data for the target player, with type {@link AttachedPlayer}. If no player is found, a
+   *         player is automatically created and is updated across all player data registries as well as the default
+   *         {@link Player} registry.
+   * @throws IllegalArgumentException if the mod of that {@code id} has not been registered
    */
-  public static AttachedPlayer get(String id, ServerPlayer player) {
-    try {
-      ConcurrentHashMap<String, AttachedPlayer> values = players.get(id);
-      if (values == null) return null;
-
-      return getHelper(id, player, values);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Retrieve the data of a specific player of a mod. Note that this method returns the data with {@link AttachedPlayer}
-   * type. To get the player data in the correct class, cast it with:
-   *  <blockquote><pre>
-   *   public static CustomPlayer get(String uuid) {
-   *     return (CustomPlayer) PlayerManager.get("custom", uuid);
-   *   }
-   * </pre></blockquote>
-   *
-   * @param id the unique id of the mod
-   * @param uuid the target player's string uuid
-   * @return the custom player data for the target player, with type {@link Object}
-   */
-  public static AttachedPlayer get(String id, String uuid) {
-    ConcurrentHashMap<String, AttachedPlayer> values = players.get(id);
-    if (values == null) return null;
-
-    return values.get(uuid);
-  }
-
-  private static AttachedPlayer getHelper(
-    String id, ServerPlayer player, ConcurrentHashMap<String, AttachedPlayer> values
-  ) throws Exception {
-    String uuid = player.getStringUUID();
-
-    if (!values.containsKey(uuid)) {
-      Class<? extends AttachedPlayer> playerClass = ConfigManager.attachments().get(id).playerClass();
-
-      AttachedPlayer newInstance = playerClass.getConstructor().newInstance();
-      newInstance.player = Player.get(player);
-      values.put(uuid, newInstance);
-    }
-
-    return values.get(uuid);
-  }
-
-  /**
-   * Loads all required player data of a player. This method should not be called, as it is automatically called
-   * each time a player joins. Calling it otherwise may result in unexpected bugs.
-   */
-  @ApiStatus.Internal
-  public static void loadAllPlayerAttachments(ServerPlayer player) {
-    for (String attachment : ConfigManager.attachments().keySet()) {
-      get(attachment, player);
-    }
-  }
-
-  /**
-   * Saves the player data of all custom SMPs. This method should not be called, as it is automatically called each time
-   * the server is saved. Calling it otherwise may result in unexpected bugs.
-   */
-  @ApiStatus.Internal
-  public static void saveAll() {
-    players.forEach((id, values) -> {
-      try {
-        save(id, values);
-      } catch (IOException e) {
-        SMPLibs.LOGGER.error("An error occurred while trying to save player data for mod {}: ", id, e);
-      }
-    });
-  }
+  public static @NonNull AttachedPlayer get(String id, ServerPlayer player) { return get(id, player.getStringUUID()); }
 }

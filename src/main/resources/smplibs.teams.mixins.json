@@ -3,7 +3,9 @@
   "package": "lucas.smplibs.teams.mixins",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "OnTeamAdded"
+    "PlayerTeamInjector",
+    "ScoreboardInjector",
+    "TeamArgumentInjector"
   ],
   "injectors": {
     "defaultRequire": 1

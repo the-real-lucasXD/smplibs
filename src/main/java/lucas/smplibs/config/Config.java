@@ -9,7 +9,7 @@ import org.jspecify.annotations.NonNull;
  * @since 1.0.0
  */
 public final class Config {
-  static Config INSTANCE = new Config();
+  static Config INSTANCE;
 
   public @NonNull CombatConfig combat = new CombatConfig();
 

@@ -5,32 +5,28 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.HashMap;
 
 /**
- * Contains the listener class to register events to execute during each tick, reducing the need for mixins.
- * Register the method with a code like this:
+ * Contains the listener class to register events to execute when the server saves. Register the method with a code
+ * like this:
  *
  * <blockquote><pre>
  *   // No limit
- *   TickListener.register(() -> {
+ *   ServerSavedListener.register(() -> {
  *     // your logic here
  *   });
  *
- *   // Limit of 400 calls (only works for 20s each server start)
- *   TickListener.register(() -> {
+ *   // Limit of 3 calls
+ *   ServerSavedListener.register(() -> {
  *     // your logic here
- *   }, 400);
+ *   }, 3);
  * </pre></blockquote>
+ *
  * @since 1.2.0
  */
-public final class TickListener {
+public final class ServerSavedListener {
   private static final HashMap<Runnable, Integer> registered = new HashMap<>();
 
-  public static void register(Runnable method) {
-    register(method, -1);
-  }
-
-  public static void register(Runnable method, Integer limit) {
-    registered.put(method, limit);
-  }
+  public static void register(Runnable method) { register(method, -1); }
+  public static void register(Runnable method, Integer limit) { registered.put(method, limit); }
 
   @ApiStatus.Internal
   public static void trigger() {
